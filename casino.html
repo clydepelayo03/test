@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Salmon Casino - Card Slot Machine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('img/bg-water.png') no-repeat center;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: black;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .game-title {
+            color: #ffd700;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+
+        .game-subtitle {
+            color: #d4af37;
+            font-size: 14px;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-stat {
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .header-stat-label {
+            font-size: 12px;
+            color: #d4af37;
+            margin-bottom: 2px;
+        }
+
+        .header-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Audio Controls */
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .audio-button {
+            background: linear-gradient(145deg, #6b5537, #5a4332);
+            border: 2px solid #4a3728;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #ffd700;
+            font-size: 16px;
+        }
+
+        .audio-button:hover {
+            background: linear-gradient(145deg, #5a4332, #6b5537);
+            transform: scale(1.1);
+        }
+
+        .audio-button.muted {
+            background: linear-gradient(145deg, #8b0000, #660000);
+            color: #ffffff;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: linear-gradient(145deg, #8b6f47, #6b5537);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            border: 3px solid #5a4332;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .header-game {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: linear-gradient(145deg, #6b5537, #5a4332);
+            border-radius: 15px;
+            padding: 15px 25px;
+            border: 2px solid #4a3728;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            color: #ffd700;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .slot-machine {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 3px solid #333;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .reels {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .reel {
+            width: 80px;
+            height: 100px;
+            background: #000;
+            border-radius: 8px;
+            border: 2px solid #444;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #b1b1b1;
+            border-radius: 6px;
+            position: absolute;
+            top: 0;
+            transition: transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            padding: 5px;
+        }
+
+        .card.spinning {
+            animation: spin 0.2s linear infinite;
+            will-change: transform;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translateY(0) translateZ(0);
+                -webkit-transform: translateY(0) translateZ(0);
+            }
+
+            100% {
+                transform: translateY(-100%) translateZ(0);
+                -webkit-transform: translateY(-100%) translateZ(0);
+            }
+        }
+
+        /* Add webkit prefixes for better mobile support */
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: translateY(0) translateZ(0);
+                transform: translateY(0) translateZ(0);
+            }
+
+            100% {
+                -webkit-transform: translateY(-100%) translateZ(0);
+                transform: translateY(-100%) translateZ(0);
+            }
+        }
+
+        .card.spinning {
+            -webkit-animation: spin 0.2s linear infinite;
+            animation: spin 0.2s linear infinite;
+            will-change: transform;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-width: 60px;
+            max-height: 80px;
+        }
+
+        .coin {
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            color: #8b6914;
+            font-size: 30px;
+            font-weight: bold;
+            border: 2px solid #b8860b;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .skull {
+            background: white;
+            border: 2px solid #8b0000;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                0 0 10px rgba(139, 0, 0, 0.3);
+            animation: ominousGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes ominousGlow {
+            0% {
+                box-shadow:
+                    0 2px 4px rgba(0, 0, 0, 0.5),
+                    0 0 10px rgba(139, 0, 0, 0.3);
+            }
+
+            100% {
+                box-shadow:
+                    0 2px 4px rgba(0, 0, 0, 0.5),
+                    0 0 20px rgba(139, 0, 0, 0.6);
+            }
+        }
+
+        .message {
+            background: linear-gradient(145deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 2px solid #229954;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message.lose {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            border-color: #a93226;
+        }
+
+        .message.curse {
+            background: linear-gradient(145deg, #8b0000, #660000);
+            border-color: #4d0000;
+            animation: curseFlash 0.5s ease-in-out 3;
+        }
+
+        .message.warning {
+            background: linear-gradient(145deg, #f39c12, #e67e22);
+            border-color: #d68910;
+        }
+
+        @keyframes curseFlash {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .message.hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .spin-button {
+            background: linear-gradient(145deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            box-shadow:
+                0 6px 12px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            border: 3px solid #229954;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .spin-button:hover {
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 16px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .spin-button:active {
+            transform: translateY(0);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .spin-button:disabled {
+            background: linear-gradient(145deg, #7f8c8d, #95a5a6);
+            cursor: not-allowed;
+            transform: none;
+            border-color: #5d6d7e;
+        }
+
+        .stats-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #d4af37;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: black;
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            color: #d4af37;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-title {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: white;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: #ffd700;
+        }
+
+        .footer-bottom {
+            /* margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid white; */
+            font-size: 12px;
+            color: white;
+        }
+
+
+        /* Game Over Modal */
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .game-over-modal {
+            background: linear-gradient(145deg, #8b6f47, #6b5537);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 3px solid #5a4332;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.6),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            width: 90%;
+            animation: slideIn 0.5s ease;
+        }
+
+        .game-over-title {
+            color: #e74c3c;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-over-message {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-over-stats {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #333;
+        }
+
+        .game-over-stats h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .game-over-stats div {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+
+
+        .restart-button {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 0 10px;
+            box-shadow:
+                0 6px 12px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            border: 3px solid #a93226;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .play-again {
+            padding-left: 57px;
+            padding-right: 57px;
+            margin-bottom: 20px;
+        }
+
+        .restart-button:hover {
+            background: linear-gradient(145deg, #c0392b, #e74c3c);
+            transform: translateY(-2px);
+        }
+
+        .bonus-button {
+            background: linear-gradient(145deg, #f39c12, #e67e22);
+            border-color: #d68910;
+        }
+
+        .bonus-button:hover {
+            background: linear-gradient(145deg, #e67e22, #f39c12);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .logo {
+                height: 70px;
+            }
+
+            .game-title {
+                font-size: 20px;
+            }
+
+            .header-stats>button {
+                display: none;
+            }
+
+            .header-stats {
+                justify-content: center;
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .game-container {
+                padding: 20px;
+            }
+
+            .header-game {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .reel {
+                width: 60px;
+                height: 80px;
+            }
+
+            .card-image {
+                max-width: 45px;
+                max-height: 60px;
+            }
+
+            .stats-footer {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-links {
+                justify-content: center;
+            }
+
+            .game-over-modal {
+                padding: 30px 20px;
+            }
+
+            .game-over-title {
+                font-size: 28px;
+            }
+
+            .restart-button {
+                display: block;
+                margin: 10px auto;
+                width: 100%;
+            }
+
+            .audio-controls {
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px 15px;
+            }
+
+            .logo {
+                height: 70px;
+            }
+
+            .game-title {
+                font-size: 18px;
+            }
+
+            .game-subtitle {
+                font-size: 12px;
+            }
+
+            .header-stat-value {
+                font-size: 16px;
+            }
+
+            .stat-label {
+                font-size: 20px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .footer {
+                padding: 15px;
+            }
+
+            .footer-text {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .reel {
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+                -webkit-perspective: 1000px;
+                perspective: 1000px;
+            }
+
+            .card {
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+
+            .card.spinning {
+                animation-duration: 0.2s;
+                /* Slightly slower on mobile */
+                -webkit-animation-duration: 0.2s;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="img/logo2.png" alt="Lucky Salmon Casino" class="logo">
+            </div>
+            <div class="header-stats">
+                <div class="audio-controls">
+                    <div class="audio-button" id="musicToggle" onclick="toggleMusic()" title="Toggle Background Music">
+                        🎵
+                    </div>
+                    <div class="audio-button" id="soundToggle" onclick="toggleSounds()" title="Toggle Sound Effects">
+                        🔊
+                    </div>
+                </div>
+                <button class="spin-button">Register</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="game-container">
+            <div class="header-game">
+                <div class="stat-box">
+                    <div class="stat-label">COINS</div>
+                    <div class="stat-value" id="coins">1030</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">COST</div>
+                    <div class="stat-value" id="cost">10</div>
+                </div>
+            </div>
+
+            <div class="slot-machine">
+                <div class="reels" id="reels">
+                    <div class="reel" id="reel1">
+                        <div class="card" id="card1">
+                            <img src="img/red-diamond.png" alt="Diamond" class="card-image">
+                        </div>
+                    </div>
+                    <div class="reel" id="reel2">
+                        <div class="card" id="card2">
+                            <img src="img/black-spade.png" alt="Spade" class="card-image">
+                        </div>
+                    </div>
+                    <div class="reel" id="reel3">
+                        <div class="card coin" id="card3">
+                            <div>💰</div>
+                        </div>
+                    </div>
+                    <div class="reel" id="reel4">
+                        <div class="card" id="card4">
+                            <img src="img/red-heart.png" alt="Heart" class="card-image">
+                        </div>
+                    </div>
+                    <div class="reel" id="reel5">
+                        <div class="card" id="card5">
+                            <img src="img/black-clover.png" alt="Club" class="card-image">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message" id="message">
+                    Ready to spin! Good luck!
+                </div>
+            </div>
+
+            <button class="spin-button" id="spinButton" onclick="spin()">
+                Spin!
+            </button>
+
+        </div>
+    </main>
+    <audio loop id="bg-music">
+        <source src="music/casino.mp3" type="audio/mpeg">
+    </audio>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bottom">
+            ©2025 Lucky Salmon Casino. All rights reserved. | Play responsibly | 18+
+        </div>
+    </footer>
+
+    <!-- Game Over Modal -->
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <div class="game-over-modal">
+            <div class="game-over-title">GAME OVER</div>
+            <div class="game-over-message">
+                You've run out of coins! But don't worry, every gambler gets another chance.
+            </div>
+            <button class="restart-button play-again" onclick="restartGame()">
+                🎰 Play Again
+            </button>
+            <button class="restart-button bonus-button" onclick="getBonusCoins()">
+                💰 Get Bonus Coins
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const music = document.getElementById('bg-music');
+            const button = document.getElementById('musicToggle');
+            if (music) {
+                music.volume = 0.2; // Set volume between 0.0 (silent) and 1.0 (full)
+            }
+            if (musicEnabled) {
+                button.textContent = '🎵';
+                button.classList.remove('muted');
+            } else {
+                button.textContent = '🔇';
+                button.classList.add('muted');
+            }
+            // ...existing code...
+        });
+
+        let coins = 1000;
+        let cost = 10;
+        let isSpinning = false;
+        let totalSpins = 0;
+        let totalWins = 0;
+        let totalCurses = 0;
+        let highestBalance = 1000;
+        let gameOver = false;
+
+        // Audio System
+        let soundsEnabled = true;
+        let musicEnabled = false;
+        let backgroundMusic = null;
+        let audioContext = null;
+
+        const music = document.getElementById('bg-music');
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            const button = document.getElementById('musicToggle');
+
+            if (musicEnabled) {
+                button.textContent = '🎵';
+                button.classList.remove('muted');
+                if (!music.paused) {
+                    music.muted = false;
+                } else {
+                    music.play();
+                }
+            } else {
+                button.textContent = '🔇';
+                button.classList.add('muted');
+                music.muted = true;
+            }
+        }
+
+
+        const suits = [
+            { type: 'spades', image: 'img/black-spade.png', name: 'spades' },
+            { type: 'hearts', image: 'img/red-heart.png', name: 'hearts' },
+            { type: 'diamonds', image: 'img/red-diamond.png', name: 'diamonds' },
+            { type: 'clubs', image: 'img/black-clover.png', name: 'clubs' }
+        ];
+
+        const payouts = {
+            5: { coins: 1000, message: "JACKPOT! 5 matching suits!" },
+            4: { coins: 100, message: "Amazing! 4 matching suits!" },
+            3: { coins: 25, message: "Great! 3 matching suits!" },
+            2: { coins: 5, message: "Nice! 2 matching suits!" }
+        };
+
+        const loseMessages = [
+            "No match this time. Try again!",
+            "Better luck next spin!",
+            "Keep trying! Fortune favors the bold!",
+            "Almost there! One more spin!",
+            "The cards weren't in your favor this time.",
+            "Don't give up! Your big win is coming!"
+        ];
+
+        const curseMessages = [
+            "🐟 CURSED SALMON! The dead fish steals 100 coins!",
+            "🐟 BAD LUCK! Rotten salmon costs you 100 coins!",
+            "🐟 FISH CURSE! You lose 100 coins to the dead salmon!",
+            "🐟 CURSED CATCH! The salmon claims 100 coins!",
+            "🐟 SALMON'S REVENGE! 100 coins swim away into darkness!"
+        ];
+
+        const lowCoinsWarnings = [
+            "⚠️ Running low on coins! Be careful!",
+            "⚠️ Only a few spins left!",
+            "⚠️ Your luck better turn around soon!",
+            "⚠️ Time to make every spin count!"
+        ];
+
+        // Audio System Functions
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        function createTone(frequency, duration, type = 'sine', volume = 0.1) {
+            if (!soundsEnabled) return;
+
+            try {
+                const ctx = initAudioContext();
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+                oscillator.type = type;
+
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + duration);
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+
+        function playSpinSound() {
+            if (!soundsEnabled) return;
+
+            // Mechanical spinning sound simulation
+            const ctx = initAudioContext();
+            const duration = 0.1;
+
+            // Create multiple tones for mechanical sound
+            createTone(200 + Math.random() * 100, duration, 'sawtooth', 0.05);
+            setTimeout(() => createTone(150 + Math.random() * 50, duration, 'square', 0.03), 50);
+        }
+
+        function playWinSound(winLevel) {
+            if (!soundsEnabled) return;
+
+            const ctx = initAudioContext();
+
+            if (winLevel === 5) {
+                // Jackpot sound - ascending melody
+                const notes = [523, 659, 784, 1047, 1319]; // C5, E5, G5, C6, E6
+                notes.forEach((note, i) => {
+                    setTimeout(() => createTone(note, 0.3, 'sine', 0.2), i * 100);
+                });
+
+                // Add some sparkle
+                setTimeout(() => {
+                    for (let i = 0; i < 10; i++) {
+                        setTimeout(() => createTone(1000 + Math.random() * 1000, 0.1, 'sine', 0.1), i * 50);
+                    }
+                }, 500);
+            } else if (winLevel >= 3) {
+                // Big win sound
+                createTone(523, 0.2, 'sine', 0.15); // C5
+                setTimeout(() => createTone(659, 0.2, 'sine', 0.15), 100); // E5
+                setTimeout(() => createTone(784, 0.3, 'sine', 0.15), 200); // G5
+            } else {
+                // Small win sound
+                createTone(523, 0.15, 'sine', 0.1); // C5
+                setTimeout(() => createTone(659, 0.15, 'sine', 0.1), 75); // E5
+            }
+        }
+
+        function playCurseSound() {
+            if (!soundsEnabled) return;
+
+            // Ominous curse sound - descending tones
+            const notes = [400, 350, 300, 250, 200];
+            notes.forEach((note, i) => {
+                setTimeout(() => createTone(note, 0.2, 'sawtooth', 0.1), i * 100);
+            });
+
+            // Add some eerie effects
+            setTimeout(() => {
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => createTone(100 + Math.random() * 100, 0.3, 'triangle', 0.05), i * 150);
+                }
+            }, 200);
+        }
+
+        function playButtonSound() {
+            if (!soundsEnabled) return;
+            createTone(800, 0.1, 'square', 0.05);
+        }
+
+        function playCoinSound() {
+            if (!soundsEnabled) return;
+            // Coin drop sound
+            createTone(1000, 0.05, 'sine', 0.1);
+            setTimeout(() => createTone(800, 0.05, 'sine', 0.08), 50);
+            setTimeout(() => createTone(600, 0.1, 'sine', 0.06), 100);
+        }
+
+        function playReelStopSound() {
+            if (!soundsEnabled) return;
+            createTone(300, 0.1, 'square', 0.08);
+        }
+
+        function startBackgroundMusic() {
+            if (!musicEnabled) return;
+
+            // Create a simple background ambient loop
+            function playAmbientLoop() {
+                if (!musicEnabled) return;
+
+                const ctx = initAudioContext();
+
+                // Create a subtle ambient chord progression
+                const chords = [
+                    [261, 329, 392], // C major
+                    [246, 311, 369], // B minor
+                    [220, 277, 329], // A minor
+                    [196, 246, 293]  // G major
+                ];
+
+                let chordIndex = 0;
+
+                function playChord() {
+                    if (!musicEnabled) return;
+
+                    const chord = chords[chordIndex % chords.length];
+                    chord.forEach(freq => {
+                        createTone(freq * 0.5, 4, 'sine', 0.02); // Very quiet background
+                    });
+
+                    chordIndex++;
+                    setTimeout(playChord, 4000); // Change chord every 4 seconds
+                }
+
+                playChord();
+            }
+
+            // Start the ambient music after a short delay
+            setTimeout(playAmbientLoop, 1000);
+        }
+
+
+        function toggleSounds() {
+            soundsEnabled = !soundsEnabled;
+            const button = document.getElementById('soundToggle');
+
+            if (soundsEnabled) {
+                button.textContent = '🔊';
+                button.classList.remove('muted');
+                // playButtonSound();
+            } else {
+                button.textContent = '🔇';
+                button.classList.add('muted');
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('coins').textContent = coins;
+            document.getElementById('cost').textContent = cost;
+            // document.getElementById('totalSpins').textContent = totalSpins;
+            // document.getElementById('totalWins').textContent = totalWins;
+            // document.getElementById('winRate').textContent = totalSpins > 0 ? Math.round((totalWins / totalSpins) * 100) + '%' : '0%';
+
+
+
+            // Update highest balance
+            if (coins > highestBalance) {
+                highestBalance = coins;
+            }
+
+            // Check for low coins warning (only if not already game over)
+            if (coins > 0 && coins < cost * 3 && !gameOver && coins >= cost) {
+                const messageElement = document.getElementById('message');
+                if (!messageElement.textContent.includes('⚠️') && !messageElement.textContent.includes('🐟')) {
+                    const warningMessage = lowCoinsWarnings[Math.floor(Math.random() * lowCoinsWarnings.length)];
+                    messageElement.textContent = warningMessage;
+                    messageElement.className = 'message warning';
+                }
+            }
+        }
+
+        function checkGameOver() {
+            // Only check for game over when coins are actually insufficient for next spin
+            if (coins < cost && !gameOver) {
+                triggerGameOver();
+                return true;
+            }
+            return false;
+        }
+
+        function triggerGameOver() {
+            gameOver = true;
+
+            // Play game over sound
+            if (soundsEnabled) {
+                setTimeout(() => {
+                    const notes = [523, 466, 415, 370, 330, 294]; // Descending sad melody
+                    notes.forEach((note, i) => {
+                        setTimeout(() => createTone(note, 0.4, 'sine', 0.1), i * 200);
+                    });
+                }, 500);
+            }
+
+            // Update final statistics
+            // document.getElementById('finalSpins').textContent = totalSpins;
+            // document.getElementById('finalWins').textContent = totalWins;
+            // document.getElementById('finalWinRate').textContent = totalSpins > 0 ? Math.round((totalWins / totalSpins) * 100) + '%' : '0%';
+            // document.getElementById('highestBalance').textContent = highestBalance;
+            // document.getElementById('finalCurses').textContent = totalCurses;
+
+            // Show game over modal
+            document.getElementById('gameOverOverlay').style.display = 'flex';
+
+            // Disable spin button
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = true;
+            spinButton.textContent = 'Game Over';
+
+            // Update message
+            document.getElementById('message').textContent = "Game Over! You're out of coins!";
+            document.getElementById('message').className = 'message lose';
+        }
+
+        function restartGame() {
+            playButtonSound();
+
+            // Reset all game variables
+            coins = 1000;
+            cost = 10;
+            isSpinning = false;
+            totalSpins = 0;
+            totalWins = 0;
+            totalCurses = 0;
+            highestBalance = 1000;
+            gameOver = false;
+
+            // Hide game over modal
+            document.getElementById('gameOverOverlay').style.display = 'none';
+
+            // Reset UI
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = false;
+            spinButton.textContent = 'Spin!';
+
+            document.getElementById('message').textContent = "Welcome back! Ready to spin again!";
+            document.getElementById('message').className = 'message';
+
+            // Update display
+            updateDisplay();
+
+            // Play welcome sound
+            setTimeout(() => {
+                createTone(523, 0.2, 'sine', 0.1);
+                setTimeout(() => createTone(659, 0.2, 'sine', 0.1), 100);
+                setTimeout(() => createTone(784, 0.2, 'sine', 0.1), 200);
+            }, 200);
+        }
+
+        function getBonusCoins() {
+            playButtonSound();
+
+            // Give bonus coins (200-500 range)
+            const bonusAmount = 200 + Math.floor(Math.random() * 301);
+            coins += bonusAmount;
+            gameOver = false;
+
+            // Play bonus sound
+            setTimeout(() => {
+                for (let i = 0; i < bonusAmount / 50; i++) {
+                    setTimeout(() => playCoinSound(), i * 100);
+                }
+            }, 200);
+
+            // Hide game over modal
+            document.getElementById('gameOverOverlay').style.display = 'none';
+
+            // Reset UI
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = false;
+            spinButton.textContent = 'Spin!';
+
+            document.getElementById('message').textContent = `🎁 Bonus! You received ${bonusAmount} coins! Good luck!`;
+            document.getElementById('message').className = 'message';
+
+            // Update display
+            updateDisplay();
+        }
+
+        function generateRandomCard() {
+            const random = Math.random();
+
+            if (random < 0.15) {
+                // 15% chance for dead salmon (curse)
+                return { type: 'salmon', image: 'img/dead-salmon3.png' };
+            } else if (random < 0.35) {
+                // 20% chance for coin
+                return { type: 'coin', symbol: '💰' };
+            } else {
+                // 65% chance for suit
+                const suit = suits[Math.floor(Math.random() * suits.length)];
+                return { type: 'suit', image: suit.image, name: suit.name };
+            }
+        }
+
+        function generateControlledResults() {
+            const shouldWin = Math.random() > 0.70; // 30% chance to win (70% chance to lose)
+
+            if (shouldWin) {
+                // Generate a winning combination (no salmon in wins)
+                const winType = Math.random();
+
+                if (winType < 0.05) {
+                    // 5% chance for 5 of a kind (within wins)
+                    const baseCard = Math.random() < 0.3 ?
+                        { type: 'coin', symbol: '💰' } :
+                        (() => {
+                            const selectedSuit = suits[Math.floor(Math.random() * suits.length)];
+                            return { type: 'suit', image: selectedSuit.image, name: selectedSuit.name };
+                        })();
+                    return Array(5).fill().map(() => ({ ...baseCard }));
+                } else if (winType < 0.20) {
+                    // 15% chance for 4 of a kind (within wins)
+                    const baseCard = Math.random() < 0.3 ?
+                        { type: 'coin', symbol: '💰' } :
+                        (() => {
+                            const selectedSuit = suits[Math.floor(Math.random() * suits.length)];
+                            return { type: 'suit', image: selectedSuit.image, name: selectedSuit.name };
+                        })();
+                    const results = Array(4).fill().map(() => ({ ...baseCard }));
+                    const randomSuit = suits[Math.floor(Math.random() * suits.length)];
+                    results.push({ type: 'suit', image: randomSuit.image, name: randomSuit.name });
+                    return shuffleArray(results);
+                } else if (winType < 0.50) {
+                    // 30% chance for 3 of a kind (within wins)
+                    const baseCard = Math.random() < 0.3 ?
+                        { type: 'coin', symbol: '💰' } :
+                        (() => {
+                            const selectedSuit = suits[Math.floor(Math.random() * suits.length)];
+                            return { type: 'suit', image: selectedSuit.image, name: selectedSuit.name };
+                        })();
+                    const results = Array(3).fill().map(() => ({ ...baseCard }));
+                    for (let i = 0; i < 2; i++) {
+                        const randomSuit = suits[Math.floor(Math.random() * suits.length)];
+                        results.push({ type: 'suit', image: randomSuit.image, name: randomSuit.name });
+                    }
+                    return shuffleArray(results);
+                } else {
+                    // 50% chance for 2 of a kind (within wins)
+                    const baseCard = Math.random() < 0.3 ?
+                        { type: 'coin', symbol: '💰' } :
+                        (() => {
+                            const selectedSuit = suits[Math.floor(Math.random() * suits.length)];
+                            return { type: 'suit', image: selectedSuit.image, name: selectedSuit.name };
+                        })();
+                    const results = Array(2).fill().map(() => ({ ...baseCard }));
+                    for (let i = 0; i < 3; i++) {
+                        const randomSuit = suits[Math.floor(Math.random() * suits.length)];
+                        results.push({ type: 'suit', image: randomSuit.image, name: randomSuit.name });
+                    }
+                    return shuffleArray(results);
+                }
+            } else {
+                // Generate a losing combination
+                const results = [];
+                const usedSymbols = new Set();
+
+                // 25% chance to include a salmon in losing spins
+                const includeSalmon = Math.random() < 0.25;
+
+                for (let i = 0; i < 5; i++) {
+                    let card;
+                    let symbol;
+                    let attempts = 0;
+
+                    if (i === 0 && includeSalmon) {
+                        // Add salmon as first card
+                        card = { type: 'salmon', image: 'img/dead-salmon3.png' };
+                        symbol = 'salmon';
+                    } else {
+                        do {
+                            // Generate non-salmon cards for losing combinations
+                            if (Math.random() < 0.25) {
+                                card = { type: 'coin', symbol: '💰' };
+                                symbol = 'coin';
+                            } else {
+                                const selectedSuit = suits[Math.floor(Math.random() * suits.length)];
+                                card = { type: 'suit', image: selectedSuit.image, name: selectedSuit.name };
+                                symbol = selectedSuit.name;
+                            }
+                            attempts++;
+
+                            // Prevent infinite loop
+                            if (attempts > 20) {
+                                const suit = suits[i % suits.length];
+                                card = { type: 'suit', image: suit.image, name: suit.name };
+                                symbol = suit.name;
+                                break;
+                            }
+                        } while (usedSymbols.has(symbol));
+                    }
+
+                    usedSymbols.add(symbol);
+                    results.push(card);
+                }
+
+                return shuffleArray(results);
+            }
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function createCardElement(cardData) {
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            if (cardData.type === 'coin') {
+                card.classList.add('coin');
+                card.innerHTML = '<div>💰</div>';
+            } else if (cardData.type === 'salmon') {
+                card.classList.add('skull');
+                card.innerHTML = `<img src="${cardData.image}" alt="Dead Salmon" class="card-image">`;
+            } else {
+                card.innerHTML = `<img src="${cardData.image}" alt="${cardData.name}" class="card-image">`;
+            }
+
+            return card;
+        }
+
+        function animateReel(reelId, finalCard, delay) {
+            return new Promise((resolve) => {
+                const reel = document.getElementById(reelId);
+                let currentCard = reel.querySelector('.card');
+
+                // Detect mobile device
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+                // Adjust timing for mobile
+                const spinInterval = isMobile ? 120 : 80; // Slower on mobile
+                const maxSpins = isMobile ? 12 : 15; // Fewer spins on mobile
+
+                // Start spinning animation
+                if (currentCard) {
+                    currentCard.classList.add('spinning');
+                }
+
+                // Generate random cards during spin
+                let spinCount = 0;
+                const totalSpins = maxSpins + Math.floor(Math.random() * (isMobile ? 5 : 10));
+
+                const spinIntervalId = setInterval(() => {
+                    // Play spinning sound occasionally
+                    if (spinCount % 3 === 0) {
+                        playSpinSound();
+                    }
+
+                    const randomCard = generateRandomCard();
+                    const newCard = createCardElement(randomCard);
+                    newCard.classList.add('spinning');
+
+                    // Force hardware acceleration on mobile
+                    if (isMobile) {
+                        newCard.style.transform = 'translateZ(0)';
+                        newCard.style.webkitTransform = 'translateZ(0)';
+                    }
+
+                    // Safely remove current card
+                    if (currentCard && currentCard.parentNode === reel) {
+                        // Remove animation class before removing element
+                        currentCard.classList.remove('spinning');
+                        reel.removeChild(currentCard);
+                    }
+
+                    // Add new card
+                    reel.appendChild(newCard);
+                    currentCard = newCard;
+
+                    spinCount++;
+
+                    if (spinCount >= totalSpins) {
+                        clearInterval(spinIntervalId);
+
+                        // Show final card after delay
+                        setTimeout(() => {
+                            const finalCardElement = createCardElement(finalCard);
+
+                            // Force hardware acceleration on mobile
+                            if (isMobile) {
+                                finalCardElement.style.transform = 'translateZ(0)';
+                                finalCardElement.style.webkitTransform = 'translateZ(0)';
+                            }
+
+                            // Safely remove spinning card
+                            if (currentCard && currentCard.parentNode === reel) {
+                                currentCard.classList.remove('spinning');
+                                reel.removeChild(currentCard);
+                            }
+
+                            // Add final card (without spinning class)
+                            reel.appendChild(finalCardElement);
+
+                            // Play reel stop sound
+                            playReelStopSound();
+
+                            resolve();
+                        }, delay);
+                    }
+                }, spinInterval);
+            });
+        }
+
+        function checkWin(results) {
+            const symbolCounts = {};
+            let hasCurse = false;
+
+            results.forEach(card => {
+                if (card.type === 'salmon') {
+                    hasCurse = true;
+                    return;
+                }
+
+                const symbol = card.type === 'coin' ? 'coin' : card.name;
+                symbolCounts[symbol] = (symbolCounts[symbol] || 0) + 1;
+            });
+
+            // Handle curse first
+            if (hasCurse) {
+                totalCurses++;
+                const cursePenalty = Math.min(100, coins); // Don't take more coins than player has
+                coins -= cursePenalty;
+
+                // Play curse sound
+                setTimeout(() => playCurseSound(), 300);
+
+                const randomCurseMessage = curseMessages[Math.floor(Math.random() * curseMessages.length)];
+                return {
+                    win: false,
+                    curse: true,
+                    message: randomCurseMessage.replace('100', cursePenalty.toString()),
+                    penalty: cursePenalty
+                };
+            }
+
+            let maxCount = 0;
+            let winningSymbol = '';
+
+            for (const [symbol, count] of Object.entries(symbolCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    winningSymbol = symbol;
+                }
+            }
+
+            if (maxCount >= 2) {
+                const payout = payouts[maxCount];
+                if (payout) {
+                    coins += payout.coins;
+                    totalWins++;
+
+                    // Play win sound based on win level
+                    setTimeout(() => playWinSound(maxCount), 300);
+
+                    // Play coin sounds for payout
+                    setTimeout(() => {
+                        const coinSounds = Math.min(payout.coins / 25, 10); // Max 10 coin sounds
+                        for (let i = 0; i < coinSounds; i++) {
+                            setTimeout(() => playCoinSound(), i * 100);
+                        }
+                    }, 800);
+
+                    let symbolName = winningSymbol;
+                    if (winningSymbol === 'coin') {
+                        symbolName = 'coins';
+                    } else if (winningSymbol === 'diamonds') {
+                        symbolName = 'diamonds';
+                    } else if (winningSymbol === 'hearts') {
+                        symbolName = 'hearts';
+                    } else if (winningSymbol === 'spades') {
+                        symbolName = 'spades';
+                    } else if (winningSymbol === 'clubs') {
+                        symbolName = 'clubs';
+                    }
+
+                    return {
+                        win: true,
+                        amount: payout.coins,
+                        message: `${payout.message.replace('suits', symbolName)}`,
+                        count: maxCount
+                    };
+                }
+            }
+
+            const randomLoseMessage = loseMessages[Math.floor(Math.random() * loseMessages.length)];
+            return { win: false, message: randomLoseMessage };
+        }
+        async function spin() {
+            if (isSpinning || gameOver) return;
+
+            // Check if player has enough coins BEFORE spinning
+            if (coins < cost) {
+                checkGameOver();
+                return;
+            }
+
+            // Play button sound
+            playButtonSound();
+
+            isSpinning = true;
+            coins -= cost;
+            totalSpins++;
+            updateDisplay();
+
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = true;
+            spinButton.textContent = 'Spinning...';
+
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = "Spinning...";
+            messageElement.className = 'message';
+
+            // Generate controlled results with balanced salmon chance
+            const results = generateControlledResults();
+
+            // Animate reels with staggered timing
+            const animations = [];
+            for (let i = 0; i < 5; i++) {
+                animations.push(animateReel(`reel${i + 1}`, results[i], i * 200));
+            }
+
+            // Wait for all animations to complete
+            await Promise.all(animations);
+
+            // Check for wins/curses
+            const winResult = checkWin(results);
+
+            setTimeout(() => {
+                messageElement.textContent = winResult.message;
+
+                if (winResult.curse) {
+                    messageElement.className = 'message curse';
+                } else if (winResult.win) {
+                    messageElement.className = 'message';
+                } else {
+                    messageElement.className = 'message lose';
+                }
+
+                updateDisplay();
+
+                // Check for game over AFTER the spin results are processed
+                if (!checkGameOver()) {
+                    isSpinning = false;
+                    spinButton.disabled = false;
+                    spinButton.textContent = 'Spin!';
+                }
+            }, 500);
+        }
+
+        // Initialize audio and display
+        document.addEventListener('DOMContentLoaded', function () {
+            updateDisplay();
+
+            // Start background music after user interaction
+            document.addEventListener('click', function initAudio() {
+                initAudioContext();
+                startBackgroundMusic();
+                document.removeEventListener('click', initAudio);
+            }, { once: true });
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+
+</html>
