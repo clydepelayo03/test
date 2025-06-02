@@ -211,100 +211,43 @@
             border-radius: 6px;
             position: absolute;
             top: 0;
-            transition: all 0.3s ease;
+            left: 0;
+            transition: all 0.2s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             padding: 5px;
             transform: translateZ(0);
             backface-visibility: hidden;
         }
 
-        /* New improved spinning animation */
+        /* Simplified spinning animation that works on mobile */
         .card.spinning {
-            animation: mobileSpin 0.3s ease-in-out infinite;
-            will-change: transform, filter;
-            transform: translateZ(0);
-            backface-visibility: hidden;
+            animation: mobileSpinning 0.15s ease-in-out infinite;
+            will-change: transform;
         }
 
-        /* Mobile-optimized spinning animation using scale and blur */
-        @keyframes mobileSpin {
+        @keyframes mobileSpinning {
             0% {
-                transform: translateZ(0) scale(1) rotateY(0deg);
-                filter: blur(0px);
+                transform: scale(1) translateZ(0);
                 opacity: 1;
-            }
-
-            25% {
-                transform: translateZ(0) scale(0.9) rotateY(90deg);
-                filter: blur(1px);
-                opacity: 0.8;
             }
 
             50% {
-                transform: translateZ(0) scale(0.8) rotateY(180deg);
-                filter: blur(2px);
+                transform: scale(0.8) translateZ(0);
                 opacity: 0.6;
             }
 
-            75% {
-                transform: translateZ(0) scale(0.9) rotateY(270deg);
-                filter: blur(1px);
-                opacity: 0.8;
-            }
-
             100% {
-                transform: translateZ(0) scale(1) rotateY(360deg);
-                filter: blur(0px);
+                transform: scale(1) translateZ(0);
                 opacity: 1;
             }
         }
 
-        /* Alternative spinning animation for older mobile devices */
-        @media (max-width: 768px) {
-            .card.spinning {
-                animation: mobileSpinSimple 0.2s linear infinite;
-            }
-
-            @keyframes mobileSpinSimple {
-                0% {
-                    transform: translateZ(0) scale(1);
-                    filter: blur(0px);
-                    opacity: 1;
-                }
-
-                50% {
-                    transform: translateZ(0) scale(0.85);
-                    filter: blur(1px);
-                    opacity: 0.7;
-                }
-
-                100% {
-                    transform: translateZ(0) scale(1);
-                    filter: blur(0px);
-                    opacity: 1;
-                }
-            }
-        }
-
-        /* Fallback for very old devices */
-        @media (max-width: 480px) {
-            .card.spinning {
-                animation: mobileSpinBasic 0.3s ease-in-out infinite;
-            }
-
-            @keyframes mobileSpinBasic {
-
-                0%,
-                100% {
-                    transform: translateZ(0) scale(1);
-                    opacity: 1;
-                }
-
-                50% {
-                    transform: translateZ(0) scale(0.9);
-                    opacity: 0.8;
-                }
-            }
+        /* Ensure final cards are properly displayed */
+        .card.final {
+            animation: none !important;
+            transform: scale(1) translateZ(0) !important;
+            opacity: 1 !important;
+            will-change: auto;
         }
 
         .card-image {
@@ -313,6 +256,7 @@
             object-fit: contain;
             max-width: 60px;
             max-height: 80px;
+            pointer-events: none;
         }
 
         .coin {
@@ -764,21 +708,6 @@
                 backface-visibility: hidden;
                 -webkit-font-smoothing: antialiased;
             }
-
-            /* Reduce animation complexity on mobile */
-            .card.spinning {
-                animation-duration: 0.2s;
-                animation-timing-function: ease-out;
-            }
-        }
-
-        /* Disable complex animations on very slow devices */
-        @media (max-width: 480px) and (max-resolution: 150dpi) {
-            .card.spinning {
-                animation: none;
-                opacity: 0.7;
-                transform: scale(0.95);
-            }
         }
     </style>
 </head>
@@ -810,7 +739,7 @@
             <div class="header-game">
                 <div class="stat-box">
                     <div class="stat-label">COINS</div>
-                    <div class="stat-value" id="coins">1030</div>
+                    <div class="stat-value" id="coins">1000</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">COST</div>
@@ -821,27 +750,27 @@
             <div class="slot-machine">
                 <div class="reels" id="reels">
                     <div class="reel" id="reel1">
-                        <div class="card" id="card1">
+                        <div class="card final" id="card1">
                             <img src="img/red-diamond.png" alt="Diamond" class="card-image">
                         </div>
                     </div>
                     <div class="reel" id="reel2">
-                        <div class="card" id="card2">
+                        <div class="card final" id="card2">
                             <img src="img/black-spade.png" alt="Spade" class="card-image">
                         </div>
                     </div>
                     <div class="reel" id="reel3">
-                        <div class="card coin" id="card3">
+                        <div class="card coin final" id="card3">
                             <div>💰</div>
                         </div>
                     </div>
                     <div class="reel" id="reel4">
-                        <div class="card" id="card4">
+                        <div class="card final" id="card4">
                             <img src="img/red-heart.png" alt="Heart" class="card-image">
                         </div>
                     </div>
                     <div class="reel" id="reel5">
-                        <div class="card" id="card5">
+                        <div class="card final" id="card5">
                             <img src="img/black-clover.png" alt="Club" class="card-image">
                         </div>
                     </div>
@@ -855,12 +784,9 @@
             <button class="spin-button" id="spinButton" onclick="spin()">
                 Spin!
             </button>
-
         </div>
     </main>
-    <audio loop id="bg-music">
-        <source src="music/casino.mp3" type="audio/mpeg">
-    </audio>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-bottom">
@@ -885,22 +811,6 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const music = document.getElementById('bg-music');
-            const button = document.getElementById('musicToggle');
-            if (music) {
-                music.volume = 0.2; // Set volume between 0.0 (silent) and 1.0 (full)
-            }
-            if (musicEnabled) {
-                button.textContent = '🎵';
-                button.classList.remove('muted');
-            } else {
-                button.textContent = '🔇';
-                button.classList.add('muted');
-            }
-            // ...existing code...
-        });
-
         let coins = 1000;
         let cost = 10;
         let isSpinning = false;
@@ -913,30 +823,9 @@
         // Audio System
         let soundsEnabled = true;
         let musicEnabled = false;
-        let backgroundMusic = null;
         let audioContext = null;
 
-        const music = document.getElementById('bg-music');
-        function toggleMusic() {
-            musicEnabled = !musicEnabled;
-            const button = document.getElementById('musicToggle');
-
-            if (musicEnabled) {
-                button.textContent = '🎵';
-                button.classList.remove('muted');
-                if (!music.paused) {
-                    music.muted = false;
-                } else {
-                    music.play();
-                }
-            } else {
-                button.textContent = '🔇';
-                button.classList.add('muted');
-                music.muted = true;
-            }
-        }
-
-
+        // Define card images
         const suits = [
             { type: 'spades', image: 'img/black-spade.png', name: 'spades' },
             { type: 'hearts', image: 'img/red-heart.png', name: 'hearts' },
@@ -1010,61 +899,33 @@
 
         function playSpinSound() {
             if (!soundsEnabled) return;
-
-            // Mechanical spinning sound simulation
-            const ctx = initAudioContext();
-            const duration = 0.1;
-
-            // Create multiple tones for mechanical sound
-            createTone(200 + Math.random() * 100, duration, 'sawtooth', 0.05);
-            setTimeout(() => createTone(150 + Math.random() * 50, duration, 'square', 0.03), 50);
+            createTone(200 + Math.random() * 100, 0.1, 'sawtooth', 0.05);
         }
 
         function playWinSound(winLevel) {
             if (!soundsEnabled) return;
 
-            const ctx = initAudioContext();
-
             if (winLevel === 5) {
-                // Jackpot sound - ascending melody
-                const notes = [523, 659, 784, 1047, 1319]; // C5, E5, G5, C6, E6
+                const notes = [523, 659, 784, 1047, 1319];
                 notes.forEach((note, i) => {
                     setTimeout(() => createTone(note, 0.3, 'sine', 0.2), i * 100);
                 });
-
-                // Add some sparkle
-                setTimeout(() => {
-                    for (let i = 0; i < 10; i++) {
-                        setTimeout(() => createTone(1000 + Math.random() * 1000, 0.1, 'sine', 0.1), i * 50);
-                    }
-                }, 500);
             } else if (winLevel >= 3) {
-                // Big win sound
-                createTone(523, 0.2, 'sine', 0.15); // C5
-                setTimeout(() => createTone(659, 0.2, 'sine', 0.15), 100); // E5
-                setTimeout(() => createTone(784, 0.3, 'sine', 0.15), 200); // G5
+                createTone(523, 0.2, 'sine', 0.15);
+                setTimeout(() => createTone(659, 0.2, 'sine', 0.15), 100);
+                setTimeout(() => createTone(784, 0.3, 'sine', 0.15), 200);
             } else {
-                // Small win sound
-                createTone(523, 0.15, 'sine', 0.1); // C5
-                setTimeout(() => createTone(659, 0.15, 'sine', 0.1), 75); // E5
+                createTone(523, 0.15, 'sine', 0.1);
+                setTimeout(() => createTone(659, 0.15, 'sine', 0.1), 75);
             }
         }
 
         function playCurseSound() {
             if (!soundsEnabled) return;
-
-            // Ominous curse sound - descending tones
             const notes = [400, 350, 300, 250, 200];
             notes.forEach((note, i) => {
                 setTimeout(() => createTone(note, 0.2, 'sawtooth', 0.1), i * 100);
             });
-
-            // Add some eerie effects
-            setTimeout(() => {
-                for (let i = 0; i < 5; i++) {
-                    setTimeout(() => createTone(100 + Math.random() * 100, 0.3, 'triangle', 0.05), i * 150);
-                }
-            }, 200);
         }
 
         function playButtonSound() {
@@ -1072,57 +933,23 @@
             createTone(800, 0.1, 'square', 0.05);
         }
 
-        function playCoinSound() {
-            if (!soundsEnabled) return;
-            // Coin drop sound
-            createTone(1000, 0.05, 'sine', 0.1);
-            setTimeout(() => createTone(800, 0.05, 'sine', 0.08), 50);
-            setTimeout(() => createTone(600, 0.1, 'sine', 0.06), 100);
-        }
-
         function playReelStopSound() {
             if (!soundsEnabled) return;
             createTone(300, 0.1, 'square', 0.08);
         }
 
-        function startBackgroundMusic() {
-            if (!musicEnabled) return;
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            const button = document.getElementById('musicToggle');
 
-            // Create a simple background ambient loop
-            function playAmbientLoop() {
-                if (!musicEnabled) return;
-
-                const ctx = initAudioContext();
-
-                // Create a subtle ambient chord progression
-                const chords = [
-                    [261, 329, 392], // C major
-                    [246, 311, 369], // B minor
-                    [220, 277, 329], // A minor
-                    [196, 246, 293]  // G major
-                ];
-
-                let chordIndex = 0;
-
-                function playChord() {
-                    if (!musicEnabled) return;
-
-                    const chord = chords[chordIndex % chords.length];
-                    chord.forEach(freq => {
-                        createTone(freq * 0.5, 4, 'sine', 0.02); // Very quiet background
-                    });
-
-                    chordIndex++;
-                    setTimeout(playChord, 4000); // Change chord every 4 seconds
-                }
-
-                playChord();
+            if (musicEnabled) {
+                button.textContent = '🎵';
+                button.classList.remove('muted');
+            } else {
+                button.textContent = '🔇';
+                button.classList.add('muted');
             }
-
-            // Start the ambient music after a short delay
-            setTimeout(playAmbientLoop, 1000);
         }
-
 
         function toggleSounds() {
             soundsEnabled = !soundsEnabled;
@@ -1131,7 +958,6 @@
             if (soundsEnabled) {
                 button.textContent = '🔊';
                 button.classList.remove('muted');
-                // playButtonSound();
             } else {
                 button.textContent = '🔇';
                 button.classList.add('muted');
@@ -1141,18 +967,11 @@
         function updateDisplay() {
             document.getElementById('coins').textContent = coins;
             document.getElementById('cost').textContent = cost;
-            // document.getElementById('totalSpins').textContent = totalSpins;
-            // document.getElementById('totalWins').textContent = totalWins;
-            // document.getElementById('winRate').textContent = totalSpins > 0 ? Math.round((totalWins / totalSpins) * 100) + '%' : '0%';
 
-
-
-            // Update highest balance
             if (coins > highestBalance) {
                 highestBalance = coins;
             }
 
-            // Check for low coins warning (only if not already game over)
             if (coins > 0 && coins < cost * 3 && !gameOver && coins >= cost) {
                 const messageElement = document.getElementById('message');
                 if (!messageElement.textContent.includes('⚠️') && !messageElement.textContent.includes('🐟')) {
@@ -1164,137 +983,39 @@
         }
 
         function checkGameOver() {
-            // Only check for game over when coins are actually insufficient for next spin
             if (coins < cost && !gameOver) {
-                triggerGameOver();
+                gameOver = true;
+                document.getElementById('gameOverOverlay').style.display = 'flex';
+                document.getElementById('spinButton').disabled = true;
+                document.getElementById('spinButton').textContent = 'Game Over';
+                document.getElementById('message').textContent = "Game Over! You're out of coins!";
+                document.getElementById('message').className = 'message lose';
                 return true;
             }
             return false;
-        }
-
-        function triggerGameOver() {
-            gameOver = true;
-
-            // Play game over sound
-            if (soundsEnabled) {
-                setTimeout(() => {
-                    const notes = [523, 466, 415, 370, 330, 294]; // Descending sad melody
-                    notes.forEach((note, i) => {
-                        setTimeout(() => createTone(note, 0.4, 'sine', 0.1), i * 200);
-                    });
-                }, 500);
-            }
-
-            // Update final statistics
-            // document.getElementById('finalSpins').textContent = totalSpins;
-            // document.getElementById('finalWins').textContent = totalWins;
-            // document.getElementById('finalWinRate').textContent = totalSpins > 0 ? Math.round((totalWins / totalSpins) * 100) + '%' : '0%';
-            // document.getElementById('highestBalance').textContent = highestBalance;
-            // document.getElementById('finalCurses').textContent = totalCurses;
-
-            // Show game over modal
-            document.getElementById('gameOverOverlay').style.display = 'flex';
-
-            // Disable spin button
-            const spinButton = document.getElementById('spinButton');
-            spinButton.disabled = true;
-            spinButton.textContent = 'Game Over';
-
-            // Update message
-            document.getElementById('message').textContent = "Game Over! You're out of coins!";
-            document.getElementById('message').className = 'message lose';
-        }
-
-        function restartGame() {
-            playButtonSound();
-
-            // Reset all game variables
-            coins = 1000;
-            cost = 10;
-            isSpinning = false;
-            totalSpins = 0;
-            totalWins = 0;
-            totalCurses = 0;
-            highestBalance = 1000;
-            gameOver = false;
-
-            // Hide game over modal
-            document.getElementById('gameOverOverlay').style.display = 'none';
-
-            // Reset UI
-            const spinButton = document.getElementById('spinButton');
-            spinButton.disabled = false;
-            spinButton.textContent = 'Spin!';
-
-            document.getElementById('message').textContent = "Welcome back! Ready to spin again!";
-            document.getElementById('message').className = 'message';
-
-            // Update display
-            updateDisplay();
-
-            // Play welcome sound
-            setTimeout(() => {
-                createTone(523, 0.2, 'sine', 0.1);
-                setTimeout(() => createTone(659, 0.2, 'sine', 0.1), 100);
-                setTimeout(() => createTone(784, 0.2, 'sine', 0.1), 200);
-            }, 200);
-        }
-
-        function getBonusCoins() {
-            playButtonSound();
-
-            // Give bonus coins (200-500 range)
-            const bonusAmount = 200 + Math.floor(Math.random() * 301);
-            coins += bonusAmount;
-            gameOver = false;
-
-            // Play bonus sound
-            setTimeout(() => {
-                for (let i = 0; i < bonusAmount / 50; i++) {
-                    setTimeout(() => playCoinSound(), i * 100);
-                }
-            }, 200);
-
-            // Hide game over modal
-            document.getElementById('gameOverOverlay').style.display = 'none';
-
-            // Reset UI
-            const spinButton = document.getElementById('spinButton');
-            spinButton.disabled = false;
-            spinButton.textContent = 'Spin!';
-
-            document.getElementById('message').textContent = `🎁 Bonus! You received ${bonusAmount} coins! Good luck!`;
-            document.getElementById('message').className = 'message';
-
-            // Update display
-            updateDisplay();
         }
 
         function generateRandomCard() {
             const random = Math.random();
 
             if (random < 0.15) {
-                // 15% chance for dead salmon (curse)
                 return { type: 'salmon', image: 'img/dead-salmon3.png' };
             } else if (random < 0.35) {
-                // 20% chance for coin
                 return { type: 'coin', symbol: '💰' };
             } else {
-                // 65% chance for suit
                 const suit = suits[Math.floor(Math.random() * suits.length)];
                 return { type: 'suit', image: suit.image, name: suit.name };
             }
         }
 
         function generateControlledResults() {
-            const shouldWin = Math.random() > 0.70; // 30% chance to win (70% chance to lose)
+            const shouldWin = Math.random() > 0.70;
 
             if (shouldWin) {
-                // Generate a winning combination (no salmon in wins)
                 const winType = Math.random();
 
                 if (winType < 0.05) {
-                    // 5% chance for 5 of a kind (within wins)
+                    // 5 of a kind
                     const baseCard = Math.random() < 0.3 ?
                         { type: 'coin', symbol: '💰' } :
                         (() => {
@@ -1303,7 +1024,7 @@
                         })();
                     return Array(5).fill().map(() => ({ ...baseCard }));
                 } else if (winType < 0.20) {
-                    // 15% chance for 4 of a kind (within wins)
+                    // 4 of a kind
                     const baseCard = Math.random() < 0.3 ?
                         { type: 'coin', symbol: '💰' } :
                         (() => {
@@ -1315,7 +1036,7 @@
                     results.push({ type: 'suit', image: randomSuit.image, name: randomSuit.name });
                     return shuffleArray(results);
                 } else if (winType < 0.50) {
-                    // 30% chance for 3 of a kind (within wins)
+                    // 3 of a kind
                     const baseCard = Math.random() < 0.3 ?
                         { type: 'coin', symbol: '💰' } :
                         (() => {
@@ -1329,7 +1050,7 @@
                     }
                     return shuffleArray(results);
                 } else {
-                    // 50% chance for 2 of a kind (within wins)
+                    // 2 of a kind
                     const baseCard = Math.random() < 0.3 ?
                         { type: 'coin', symbol: '💰' } :
                         (() => {
@@ -1344,11 +1065,9 @@
                     return shuffleArray(results);
                 }
             } else {
-                // Generate a losing combination
+                // Losing combination
                 const results = [];
                 const usedSymbols = new Set();
-
-                // 25% chance to include a salmon in losing spins
                 const includeSalmon = Math.random() < 0.25;
 
                 for (let i = 0; i < 5; i++) {
@@ -1357,12 +1076,10 @@
                     let attempts = 0;
 
                     if (i === 0 && includeSalmon) {
-                        // Add salmon as first card
                         card = { type: 'salmon', image: 'img/dead-salmon3.png' };
                         symbol = 'salmon';
                     } else {
                         do {
-                            // Generate non-salmon cards for losing combinations
                             if (Math.random() < 0.25) {
                                 card = { type: 'coin', symbol: '💰' };
                                 symbol = 'coin';
@@ -1373,7 +1090,6 @@
                             }
                             attempts++;
 
-                            // Prevent infinite loop
                             if (attempts > 20) {
                                 const suit = suits[i % suits.length];
                                 card = { type: 'suit', image: suit.image, name: suit.name };
@@ -1400,23 +1116,27 @@
             return shuffled;
         }
 
+        // FIXED: Improved card creation to ensure images are properly displayed
         function createCardElement(cardData) {
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = 'card final'; // Add final class to ensure proper display
 
             if (cardData.type === 'coin') {
                 card.classList.add('coin');
                 card.innerHTML = '<div>💰</div>';
             } else if (cardData.type === 'salmon') {
                 card.classList.add('skull');
-                card.innerHTML = `<img src="${cardData.image}" alt="Dead Salmon" class="card-image">`;
+                // Use proper image element with explicit dimensions
+                card.innerHTML = `<img src="${cardData.image}" alt="Dead Salmon" class="card-image" style="width: 100%; height: 100%; object-fit: contain;">`;
             } else {
-                card.innerHTML = `<img src="${cardData.image}" alt="${cardData.name}" class="card-image">`;
+                // Use proper image element with explicit dimensions for suit cards
+                card.innerHTML = `<img src="${cardData.image}" alt="${cardData.name}" class="card-image" style="width: 100%; height: 100%; object-fit: contain;">`;
             }
 
             return card;
         }
 
+        // FIXED: Improved animation function to ensure final cards are properly displayed
         function animateReel(reelId, finalCard, delay) {
             return new Promise((resolve) => {
                 const reel = document.getElementById(reelId);
@@ -1426,11 +1146,12 @@
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
                 // Adjust timing for mobile
-                const spinInterval = isMobile ? 120 : 80; // Slower on mobile
-                const maxSpins = isMobile ? 12 : 15; // Fewer spins on mobile
+                const spinInterval = isMobile ? 120 : 80;
+                const maxSpins = isMobile ? 12 : 15;
 
                 // Start spinning animation
                 if (currentCard) {
+                    currentCard.classList.remove('final');
                     currentCard.classList.add('spinning');
                 }
 
@@ -1446,6 +1167,7 @@
 
                     const randomCard = generateRandomCard();
                     const newCard = createCardElement(randomCard);
+                    newCard.classList.remove('final');
                     newCard.classList.add('spinning');
 
                     // Force hardware acceleration on mobile
@@ -1456,7 +1178,6 @@
 
                     // Safely remove current card
                     if (currentCard && currentCard.parentNode === reel) {
-                        // Remove animation class before removing element
                         currentCard.classList.remove('spinning');
                         reel.removeChild(currentCard);
                     }
@@ -1472,7 +1193,10 @@
 
                         // Show final card after delay
                         setTimeout(() => {
+                            // FIXED: Create final card with proper classes and content
                             const finalCardElement = createCardElement(finalCard);
+                            finalCardElement.classList.add('final');
+                            finalCardElement.classList.remove('spinning');
 
                             // Force hardware acceleration on mobile
                             if (isMobile) {
@@ -1486,7 +1210,7 @@
                                 reel.removeChild(currentCard);
                             }
 
-                            // Add final card (without spinning class)
+                            // Add final card
                             reel.appendChild(finalCardElement);
 
                             // Play reel stop sound
@@ -1513,13 +1237,11 @@
                 symbolCounts[symbol] = (symbolCounts[symbol] || 0) + 1;
             });
 
-            // Handle curse first
             if (hasCurse) {
                 totalCurses++;
-                const cursePenalty = Math.min(100, coins); // Don't take more coins than player has
+                const cursePenalty = Math.min(100, coins);
                 coins -= cursePenalty;
 
-                // Play curse sound
                 setTimeout(() => playCurseSound(), 300);
 
                 const randomCurseMessage = curseMessages[Math.floor(Math.random() * curseMessages.length)];
@@ -1547,28 +1269,11 @@
                     coins += payout.coins;
                     totalWins++;
 
-                    // Play win sound based on win level
                     setTimeout(() => playWinSound(maxCount), 300);
-
-                    // Play coin sounds for payout
-                    setTimeout(() => {
-                        const coinSounds = Math.min(payout.coins / 25, 10); // Max 10 coin sounds
-                        for (let i = 0; i < coinSounds; i++) {
-                            setTimeout(() => playCoinSound(), i * 100);
-                        }
-                    }, 800);
 
                     let symbolName = winningSymbol;
                     if (winningSymbol === 'coin') {
                         symbolName = 'coins';
-                    } else if (winningSymbol === 'diamonds') {
-                        symbolName = 'diamonds';
-                    } else if (winningSymbol === 'hearts') {
-                        symbolName = 'hearts';
-                    } else if (winningSymbol === 'spades') {
-                        symbolName = 'spades';
-                    } else if (winningSymbol === 'clubs') {
-                        symbolName = 'clubs';
                     }
 
                     return {
@@ -1583,16 +1288,15 @@
             const randomLoseMessage = loseMessages[Math.floor(Math.random() * loseMessages.length)];
             return { win: false, message: randomLoseMessage };
         }
+
         async function spin() {
             if (isSpinning || gameOver) return;
 
-            // Check if player has enough coins BEFORE spinning
             if (coins < cost) {
                 checkGameOver();
                 return;
             }
 
-            // Play button sound
             playButtonSound();
 
             isSpinning = true;
@@ -1608,7 +1312,6 @@
             messageElement.textContent = "Spinning...";
             messageElement.className = 'message';
 
-            // Generate controlled results with balanced salmon chance
             const results = generateControlledResults();
 
             // Animate reels with staggered timing
@@ -1636,7 +1339,6 @@
 
                 updateDisplay();
 
-                // Check for game over AFTER the spin results are processed
                 if (!checkGameOver()) {
                     isSpinning = false;
                     spinButton.disabled = false;
@@ -1645,19 +1347,54 @@
             }, 500);
         }
 
-        // Initialize audio and display
+        function restartGame() {
+            playButtonSound();
+            coins = 1000;
+            cost = 10;
+            isSpinning = false;
+            totalSpins = 0;
+            totalWins = 0;
+            totalCurses = 0;
+            highestBalance = 1000;
+            gameOver = false;
+
+            document.getElementById('gameOverOverlay').style.display = 'none';
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = false;
+            spinButton.textContent = 'Spin!';
+
+            document.getElementById('message').textContent = "Welcome back! Ready to spin again!";
+            document.getElementById('message').className = 'message';
+
+            updateDisplay();
+        }
+
+        function getBonusCoins() {
+            playButtonSound();
+            const bonusAmount = 200 + Math.floor(Math.random() * 301);
+            coins += bonusAmount;
+            gameOver = false;
+
+            document.getElementById('gameOverOverlay').style.display = 'none';
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = false;
+            spinButton.textContent = 'Spin!';
+
+            document.getElementById('message').textContent = `🎁 Bonus! You received ${bonusAmount} coins! Good luck!`;
+            document.getElementById('message').className = 'message';
+
+            updateDisplay();
+        }
+
+        // Initialize
         document.addEventListener('DOMContentLoaded', function () {
             updateDisplay();
-
-            // Start background music after user interaction
             document.addEventListener('click', function initAudio() {
                 initAudioContext();
-                startBackgroundMusic();
                 document.removeEventListener('click', initAudio);
             }, { once: true });
         });
 
-        // Initialize display
         updateDisplay();
     </script>
 </body>
