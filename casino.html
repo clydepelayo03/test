@@ -211,51 +211,100 @@
             border-radius: 6px;
             position: absolute;
             top: 0;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             padding: 5px;
-        }
-
-        .card.spinning {
-            animation: spin 0.2s linear infinite;
-            will-change: transform;
-            -webkit-transform: translateZ(0);
             transform: translateZ(0);
-        }
-
-        @keyframes spin {
-            0% {
-                transform: translateY(0) translateZ(0);
-                -webkit-transform: translateY(0) translateZ(0);
-            }
-
-            100% {
-                transform: translateY(-100%) translateZ(0);
-                -webkit-transform: translateY(-100%) translateZ(0);
-            }
-        }
-
-        /* Add webkit prefixes for better mobile support */
-        @-webkit-keyframes spin {
-            0% {
-                -webkit-transform: translateY(0) translateZ(0);
-                transform: translateY(0) translateZ(0);
-            }
-
-            100% {
-                -webkit-transform: translateY(-100%) translateZ(0);
-                transform: translateY(-100%) translateZ(0);
-            }
-        }
-
-        .card.spinning {
-            -webkit-animation: spin 0.2s linear infinite;
-            animation: spin 0.2s linear infinite;
-            will-change: transform;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
-            -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
+        }
+
+        /* New improved spinning animation */
+        .card.spinning {
+            animation: mobileSpin 0.3s ease-in-out infinite;
+            will-change: transform, filter;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        /* Mobile-optimized spinning animation using scale and blur */
+        @keyframes mobileSpin {
+            0% {
+                transform: translateZ(0) scale(1) rotateY(0deg);
+                filter: blur(0px);
+                opacity: 1;
+            }
+
+            25% {
+                transform: translateZ(0) scale(0.9) rotateY(90deg);
+                filter: blur(1px);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: translateZ(0) scale(0.8) rotateY(180deg);
+                filter: blur(2px);
+                opacity: 0.6;
+            }
+
+            75% {
+                transform: translateZ(0) scale(0.9) rotateY(270deg);
+                filter: blur(1px);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateZ(0) scale(1) rotateY(360deg);
+                filter: blur(0px);
+                opacity: 1;
+            }
+        }
+
+        /* Alternative spinning animation for older mobile devices */
+        @media (max-width: 768px) {
+            .card.spinning {
+                animation: mobileSpinSimple 0.2s linear infinite;
+            }
+
+            @keyframes mobileSpinSimple {
+                0% {
+                    transform: translateZ(0) scale(1);
+                    filter: blur(0px);
+                    opacity: 1;
+                }
+
+                50% {
+                    transform: translateZ(0) scale(0.85);
+                    filter: blur(1px);
+                    opacity: 0.7;
+                }
+
+                100% {
+                    transform: translateZ(0) scale(1);
+                    filter: blur(0px);
+                    opacity: 1;
+                }
+            }
+        }
+
+        /* Fallback for very old devices */
+        @media (max-width: 480px) {
+            .card.spinning {
+                animation: mobileSpinBasic 0.3s ease-in-out infinite;
+            }
+
+            @keyframes mobileSpinBasic {
+
+                0%,
+                100% {
+                    transform: translateZ(0) scale(1);
+                    opacity: 1;
+                }
+
+                50% {
+                    transform: translateZ(0) scale(0.9);
+                    opacity: 0.8;
+                }
+            }
         }
 
         .card-image {
@@ -455,13 +504,9 @@
         }
 
         .footer-bottom {
-            /* margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid white; */
             font-size: 12px;
             color: white;
         }
-
 
         /* Game Over Modal */
         .game-over-overlay {
@@ -527,8 +572,6 @@
             margin-bottom: 8px;
             font-size: 16px;
         }
-
-
 
         .restart-button {
             background: linear-gradient(145deg, #e74c3c, #c0392b);
@@ -709,25 +752,32 @@
             }
         }
 
+        /* Performance optimizations for mobile */
         @media (max-width: 768px) {
             .reel {
-                -webkit-transform: translateZ(0);
                 transform: translateZ(0);
-                -webkit-perspective: 1000px;
                 perspective: 1000px;
             }
 
             .card {
-                -webkit-transform: translateZ(0);
                 transform: translateZ(0);
-                -webkit-backface-visibility: hidden;
                 backface-visibility: hidden;
+                -webkit-font-smoothing: antialiased;
             }
 
+            /* Reduce animation complexity on mobile */
             .card.spinning {
                 animation-duration: 0.2s;
-                /* Slightly slower on mobile */
-                -webkit-animation-duration: 0.2s;
+                animation-timing-function: ease-out;
+            }
+        }
+
+        /* Disable complex animations on very slow devices */
+        @media (max-width: 480px) and (max-resolution: 150dpi) {
+            .card.spinning {
+                animation: none;
+                opacity: 0.7;
+                transform: scale(0.95);
             }
         }
     </style>
