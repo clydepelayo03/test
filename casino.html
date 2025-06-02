@@ -863,6 +863,7 @@
         let audioContext = null;
         let audioInitialized = false;
         let backgroundMusic = document.getElementById('backgroundMusic');
+        const MUSIC_VOLUME = 0.15; // Reduced to 15% (50% of original 30%)
 
         // Mobile audio initialization
         function initAudioContext() {
@@ -949,12 +950,12 @@
             if (!musicEnabled) return;
 
             try {
-                // Set volume
-                backgroundMusic.volume = 0.3;
+                // Set volume to 15% (reduced by 50% from original 30%)
+                backgroundMusic.volume = MUSIC_VOLUME;
 
                 // Play the music
                 backgroundMusic.play().then(() => {
-                    console.log('Background music started');
+                    console.log('Background music started at volume:', MUSIC_VOLUME);
                     updateAudioStatus();
                 }).catch(error => {
                     console.log('Could not play background music:', error);
@@ -1573,13 +1574,19 @@
 
             // Set up background music
             backgroundMusic = document.getElementById('backgroundMusic');
-            backgroundMusic.volume = 0.3;
+            backgroundMusic.volume = MUSIC_VOLUME; // Set initial volume to 15%
 
             // Update audio status indicators
             updateAudioStatus();
 
             console.log('Audio initialization listeners added');
         });
+
+        // If music is already playing, update its volume immediately
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.volume = MUSIC_VOLUME;
+            console.log('Updated background music volume to:', MUSIC_VOLUME);
+        }
 
         updateDisplay();
     </script>
